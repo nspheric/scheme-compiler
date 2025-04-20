@@ -1,0 +1,82 @@
+Scheme:
+------
+
+def := (define var exp)
+       | (define (var <formals>) exp)
+	   
+exp := variable
+    | (quote exp)
+    | (quasiquote exp)
+    | (exp exp ...)
+    | (lambda <formals> exp)
+    | (if exp exp exp)
+    | (if exp exp)
+    | (set! var exp)
+    | (cond <clause1> <clause2> ...)
+    | (cond <clause1> <clause2> ... (else exp))
+    | (case <key> <clause1> <clause2> ...)
+    | (and exp exp)
+    | (or exp exp)
+    | (when exp exp1 exp2 ..)
+    | (let <bindings> exp)
+    | (let* <bindings> exp)
+    | (letrec <bindings> exp)
+    | (quote <datum>)
+    | (when exp exp1)
+    | (unless exp exp1)
+    | (while exp exp)
+    | (eqv? exp exp)
+    | (begin exp exp*)
+
+core:
+----
+
+def := (define var exp)
+    | (define (var <formals>) exp)
+
+<exp> ::= <var>
+       | <number>
+       | <prim>
+       | (quote <literal>)
+       | (lambda (<var>*) <exp>)
+       | (set <var> <exp>)
+       | (if <exp> <exp> <exp>)
+       | <prim>
+       | (<exp> <exp>*)
+
+<prim> ::= + | < | = | > | cons | vector
+
+anf:
+----
+
+<def> ::= (define <var> <exp>)
+
+<aexp> ::= (lambda <formals> <exp>)
+        |  <number>
+	|  <boolean>
+	|  <var>
+	| (quote <exp>)
+
+<cexp> ::= (<aexp> <aexp> ...)
+        |  (if <aexp> <exp> <exp>)
+	|  (set <var> <exp>)
+
+<exp> ::= (let ((<var> <cexp>)) <exp>)
+       |  <aexp>
+       |  <cexp>
+         
+
+
+todo
+----
+- structure compiler according to the above induction definitions.
+    this way you know for sure youre working with the correct ir.
+
+- get the desugaring right and the other passes too
+   - so just use the core in the anf and closure conversion pass and toselect
+
+- improve closure conversion
+
+- add the rest of constructs to the parser and get rid of things that are not exps
+
+- compile the whole interpreter to x86 ast and after implement register allocation
